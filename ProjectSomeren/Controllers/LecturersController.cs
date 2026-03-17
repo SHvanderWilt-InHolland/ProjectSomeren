@@ -20,7 +20,7 @@ namespace ProjectSomeren.Controllers
         {
             List<Lecturer> lecturers = new List<Lecturer>();
 
-            string query = "SELECT teacher_id, first_name, last_name, email, department FROM Teacher";
+            string query = "SELECT teacher_id, first_name, last_name, email, department, age, telephone_number FROM Teacher";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -34,10 +34,12 @@ namespace ProjectSomeren.Controllers
                         Lecturer lecturer = new Lecturer
                         {
                             Id = reader.GetInt32(0),
-                            FirstName = reader.GetString(1),
-                            LastName = reader.GetString(2),
-                            Email = reader.GetString(3),
-                            Department = reader.GetString(4)
+                            FirstName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                            LastName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Email = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                            Department = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                            Age = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                            TelephoneNumber = reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
                         };
                         lecturers.Add(lecturer);
                     }
@@ -70,13 +72,15 @@ namespace ProjectSomeren.Controllers
                     int newTeacherId = (int)getMaxIdCommand.ExecuteScalar();
 
                     // Insert the new lecturer with the generated ID
-                    string insertQuery = "INSERT INTO Teacher (teacher_id, first_name, last_name, email, department) VALUES (@TeacherId, @FirstName, @LastName, @Email, @Department)";
+                    string insertQuery = "INSERT INTO Teacher (teacher_id, first_name, last_name, email, department, age, telephone_number) VALUES (@TeacherId, @FirstName, @LastName, @Email, @Department, @Age, @TelephoneNumber)";
                     SqlCommand insertCommand = new SqlCommand(insertQuery, connection);
                     insertCommand.Parameters.AddWithValue("@TeacherId", newTeacherId);
                     insertCommand.Parameters.AddWithValue("@FirstName", lecturer.FirstName ?? string.Empty);
                     insertCommand.Parameters.AddWithValue("@LastName", lecturer.LastName ?? string.Empty);
                     insertCommand.Parameters.AddWithValue("@Email", lecturer.Email ?? string.Empty);
                     insertCommand.Parameters.AddWithValue("@Department", lecturer.Department ?? string.Empty);
+                    insertCommand.Parameters.AddWithValue("@Age", lecturer.Age);
+                    insertCommand.Parameters.AddWithValue("@TelephoneNumber", lecturer.TelephoneNumber ?? string.Empty);
 
                     insertCommand.ExecuteNonQuery();
                 }
@@ -92,7 +96,7 @@ namespace ProjectSomeren.Controllers
         {
             Lecturer lecturer = null;
 
-            string query = "SELECT teacher_id, first_name, last_name, email, department FROM Teacher WHERE teacher_id = @Id";
+            string query = "SELECT teacher_id, first_name, last_name, email, department, age, telephone_number FROM Teacher WHERE teacher_id = @Id";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -107,10 +111,12 @@ namespace ProjectSomeren.Controllers
                         lecturer = new Lecturer
                         {
                             Id = reader.GetInt32(0),
-                            FirstName = reader.GetString(1),
-                            LastName = reader.GetString(2),
-                            Email = reader.GetString(3),
-                            Department = reader.GetString(4)
+                            FirstName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                            LastName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Email = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                            Department = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                            Age = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                            TelephoneNumber = reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
                         };
                     }
                 }
@@ -136,16 +142,18 @@ namespace ProjectSomeren.Controllers
 
             if (ModelState.IsValid)
             {
-                string query = "UPDATE Teacher SET first_name = @FirstName, last_name = @LastName, email = @Email, department = @Department WHERE teacher_id = @Id";
+                string query = "UPDATE Teacher SET first_name = @FirstName, last_name = @LastName, email = @Email, department = @Department, age = @Age, telephone_number = @TelephoneNumber WHERE teacher_id = @Id";
 
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     SqlCommand command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@Id", lecturer.Id);
-                    command.Parameters.AddWithValue("@FirstName", lecturer.FirstName);
-                    command.Parameters.AddWithValue("@LastName", lecturer.LastName);
-                    command.Parameters.AddWithValue("@Email", lecturer.Email);
-                    command.Parameters.AddWithValue("@Department", lecturer.Department);
+                    command.Parameters.AddWithValue("@FirstName", lecturer.FirstName ?? string.Empty);
+                    command.Parameters.AddWithValue("@LastName", lecturer.LastName ?? string.Empty);
+                    command.Parameters.AddWithValue("@Email", lecturer.Email ?? string.Empty);
+                    command.Parameters.AddWithValue("@Department", lecturer.Department ?? string.Empty);
+                    command.Parameters.AddWithValue("@Age", lecturer.Age);
+                    command.Parameters.AddWithValue("@TelephoneNumber", lecturer.TelephoneNumber ?? string.Empty);
 
                     connection.Open();
                     command.ExecuteNonQuery();
@@ -162,7 +170,7 @@ namespace ProjectSomeren.Controllers
         {
             Lecturer lecturer = null;
 
-            string query = "SELECT teacher_id, first_name, last_name, email, department FROM Teacher WHERE teacher_id = @Id";
+            string query = "SELECT teacher_id, first_name, last_name, email, department, age, telephone_number FROM Teacher WHERE teacher_id = @Id";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -177,10 +185,12 @@ namespace ProjectSomeren.Controllers
                         lecturer = new Lecturer
                         {
                             Id = reader.GetInt32(0),
-                            FirstName = reader.GetString(1),
-                            LastName = reader.GetString(2),
-                            Email = reader.GetString(3),
-                            Department = reader.GetString(4)
+                            FirstName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                            LastName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Email = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                            Department = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                            Age = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                            TelephoneNumber = reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
                         };
                     }
                 }
