@@ -1,3 +1,5 @@
+using Microsoft.Data.SqlClient;
+
 namespace ProjectSomeren
 {
     public class Program
@@ -8,6 +10,10 @@ namespace ProjectSomeren
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Add SQL Server connection
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddScoped<SqlConnection>(_ => new SqlConnection(connectionString));
 
             var app = builder.Build();
 

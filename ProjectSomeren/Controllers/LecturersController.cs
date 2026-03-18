@@ -15,16 +15,29 @@ namespace ProjectSomeren.Controllers
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        // Display all lecturers
-        public IActionResult Index()
+        // Display all lecturers with optional filtering by last name
+        public IActionResult Index(string searchLastName)
         {
             List<Lecturer> lecturers = new List<Lecturer>();
 
             string query = "SELECT teacher_id, first_name, last_name, email, department, age, telephone_number FROM Teacher";
+            
+            if (!string.IsNullOrEmpty(searchLastName))
+            {
+                query += " WHERE last_name LIKE @SearchLastName";
+            }
+            
+            query += " ORDER BY last_name, first_name";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(query, connection);
+                
+                if (!string.IsNullOrEmpty(searchLastName))
+                {
+                    command.Parameters.AddWithValue("@SearchLastName", "%" + searchLastName + "%");
+                }
+                
                 connection.Open();
 
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -46,6 +59,7 @@ namespace ProjectSomeren.Controllers
                 }
             }
 
+            ViewData["SearchLastName"] = searchLastName;
             return View(lecturers);
         }
 
@@ -65,6 +79,20 @@ namespace ProjectSomeren.Controllers
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
+
+                    // Check if a lecturer with the same first and last name already exists
+                    string checkDuplicateQuery = "SELECT COUNT(*) FROM Teacher WHERE first_name = @FirstName AND last_name = @LastName";
+                    SqlCommand checkDuplicateCommand = new SqlCommand(checkDuplicateQuery, connection);
+                    checkDuplicateCommand.Parameters.AddWithValue("@FirstName", lecturer.FirstName ?? string.Empty);
+                    checkDuplicateCommand.Parameters.AddWithValue("@LastName", lecturer.LastName ?? string.Empty);
+
+                    int duplicateCount = (int)checkDuplicateCommand.ExecuteScalar();
+
+                    if (duplicateCount > 0)
+                    {
+                        ModelState.AddModelError(string.Empty, $"A lecturer with the name '{lecturer.FirstName} {lecturer.LastName}' already exists. Please use a different name or check the existing records.");
+                        return View(lecturer);
+                    }
 
                     // Get the next available teacher_id
                     string getMaxIdQuery = "SELECT ISNULL(MAX(teacher_id), 0) + 1 FROM Teacher";

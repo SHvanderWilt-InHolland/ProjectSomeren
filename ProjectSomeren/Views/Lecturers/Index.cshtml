@@ -10,30 +10,70 @@
     <a asp-action="Create" class="btn btn-primary">Add New Lecturer</a>
 </p>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var lecturer in Model)
+<div class="card mb-3">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="searchLastName" class="form-control" placeholder="Search by last name..." 
+                    value="@ViewData["SearchLastName"]" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-info">Search</button>
+                <a asp-action="Index" class="btn btn-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">
+        @if (!string.IsNullOrEmpty(ViewData["SearchLastName"]?.ToString()))
         {
-            <tr>
-                <td>@lecturer.FirstName</td>
-                <td>@lecturer.LastName</td>
-                <td>@lecturer.Email</td>
-                <td>@lecturer.Department</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@lecturer.Id" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@lecturer.Id" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
+            <p>No lecturers found with last name containing "@ViewData["SearchLastName"]"</p>
         }
-    </tbody>
-</table>
+        else
+        {
+            <p>No lecturers found.</p>
+        }
+    </div>
+}
+else
+{
+    <p>Total lecturers: <strong>@Model.Count</strong>
+        @if (!string.IsNullOrEmpty(ViewData["SearchLastName"]?.ToString()))
+        {
+            <span>(filtered by last name: <strong>@ViewData["SearchLastName"]</strong>)</span>
+        }
+    </p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Email</th>
+                <th>Telephone Number</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lecturer in Model)
+            {
+                <tr>
+                    <td>@lecturer.LastName</td>
+                    <td>@lecturer.FirstName</td>
+                    <td>@lecturer.Email</td>
+                    <td>@lecturer.TelephoneNumber</td>
+                    <td>@lecturer.Age</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@lecturer.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@lecturer.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
