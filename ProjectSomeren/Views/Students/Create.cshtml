@@ -1,0 +1,54 @@
+@model ProjectSomeren.Models.Student
+
+@{
+    ViewData["Title"] = "Add New Student";
+}
+
+<h1>Add New Student</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong> Unable to add student.
+                <div asp-validation-summary="All" class="mt-2"></div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EnrollmentDate" class="control-label"></label>
+                <input asp-for="EnrollmentDate" class="form-control" type="date" />
+                <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TelephoneNumber" class="control-label"></label>
+                <input asp-for="TelephoneNumber" class="form-control" type="tel" />
+                <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Add Student</button>
+                <a asp-action="Index" class="btn btn-secondary">Back</a>
+            </div>
+        </form>
+    </div>
+</div>

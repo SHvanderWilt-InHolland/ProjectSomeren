@@ -1,0 +1,21 @@
+@model ProjectSomeren.Models.Student
+
+@{
+    ViewData["Title"] = "Delete Student";
+}
+
+<h1>Delete Student</h1>
+
+<h3>Are you sure you want to delete this student?</h3>
+<div class="alert alert-warning">
+    <p><strong>@Model.FirstName @Model.LastName</strong></p>
+    <p>Email: @Model.Email</p>
+    <p>Enrollment Date: @Model.EnrollmentDate.ToString("yyyy-MM-dd")</p>
+    <p>Telephone: @Model.TelephoneNumber</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
