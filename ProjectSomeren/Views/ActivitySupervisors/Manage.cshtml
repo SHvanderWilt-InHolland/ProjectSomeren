@@ -1,0 +1,96 @@
+@model ActivitySupervisorViewModel
+
+@{
+    ViewData["Title"] = "Manage Supervisors";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">@Model.Activity.Name</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Description:</strong> @Model.Activity.Description</p>
+            <p><strong>Location:</strong> @Model.Activity.Location</p>
+            <p><strong>Date:</strong> @Model.Activity.StartDate.ToString("yyyy-MM-dd") to @Model.Activity.EndDate.ToString("yyyy-MM-dd")</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Current Supervisors -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Current Supervisors</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CurrentSupervisors.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var supervisor in Model.CurrentSupervisors)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@supervisor.FirstName @supervisor.LastName</strong>
+                                        <br />
+                                        <small>@supervisor.Department</small>
+                                    </div>
+                                    <form method="post" action="@Url.Action("RemoveSupervisor")" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="activityId" value="@Model.Activity.Id" />
+                                        <input type="hidden" name="lecturerId" value="@supervisor.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this supervisor?');">Remove</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No supervisors assigned yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Lecturers -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Available Lecturers</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.AvailableLecturers.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var lecturer in Model.AvailableLecturers)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@lecturer.FirstName @lecturer.LastName</strong>
+                                        <br />
+                                        <small>@lecturer.Department</small>
+                                    </div>
+                                    <form method="post" action="@Url.Action("AddSupervisor")" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="activityId" value="@Model.Activity.Id" />
+                                        <input type="hidden" name="lecturerId" value="@lecturer.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success">Add</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">All lecturers are already supervisors.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="@Url.Action("Index", "Activities")" class="btn btn-secondary">Back to Activities</a>
+    </div>
+</div>
