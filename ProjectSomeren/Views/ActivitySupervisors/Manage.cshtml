@@ -1,4 +1,4 @@
-@model ActivitySupervisorViewModel
+@model ProjectSomeren.Models.ActivitySupervisorViewModel
 
 @{
     ViewData["Title"] = "Manage Supervisors";
@@ -11,8 +11,7 @@
         </div>
         <div class="card-body">
             <p><strong>Description:</strong> @Model.Activity.Description</p>
-            <p><strong>Location:</strong> @Model.Activity.Location</p>
-            <p><strong>Date:</strong> @Model.Activity.StartDate.ToString("yyyy-MM-dd") to @Model.Activity.EndDate.ToString("yyyy-MM-dd")</p>
+            <p><strong>Date:</strong> @Model.Activity.Date.ToString("yyyy-MM-dd")</p>
         </div>
     </div>
 
@@ -91,6 +90,6 @@
     </div>
 
     <div class="mt-4">
-        <a href="@Url.Action("Index", "Activities")" class="btn btn-secondary">Back to Activities</a>
+        <a href="@Url.Action("Index", "ActivitySupervisors")" class="btn btn-secondary">Back to Activities</a>
     </div>
 </div>

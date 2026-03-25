@@ -15,6 +15,13 @@ namespace ProjectSomeren.Controllers
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
+        // Display list of all activities
+        public IActionResult Index()
+        {
+            List<Activity> activities = GetAllActivities();
+            return View(activities);
+        }
+
         // Display activity and its supervisors
         public IActionResult Manage(int id)
         {
@@ -47,7 +54,7 @@ namespace ProjectSomeren.Controllers
                 connection.Open();
 
                 // Check if the supervisor already exists
-                string checkQuery = "SELECT COUNT(*) FROM ActivitySupervisor WHERE activity_id = @ActivityId AND teacher_id = @TeacherId";
+                string checkQuery = "SELECT COUNT(*) FROM Teacher_Activity WHERE activity_id = @ActivityId AND teacher_id = @TeacherId";
                 SqlCommand checkCommand = new SqlCommand(checkQuery, connection);
                 checkCommand.Parameters.AddWithValue("@ActivityId", activityId);
                 checkCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
@@ -55,7 +62,7 @@ namespace ProjectSomeren.Controllers
                 int count = (int)checkCommand.ExecuteScalar();
                 if (count == 0)
                 {
-                    string insertQuery = "INSERT INTO ActivitySupervisor (activity_id, teacher_id) VALUES (@ActivityId, @TeacherId)";
+                    string insertQuery = "INSERT INTO Teacher_Activity (activity_id, teacher_id) VALUES (@ActivityId, @TeacherId)";
                     SqlCommand insertCommand = new SqlCommand(insertQuery, connection);
                     insertCommand.Parameters.AddWithValue("@ActivityId", activityId);
                     insertCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
@@ -74,7 +81,7 @@ namespace ProjectSomeren.Controllers
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                string deleteQuery = "DELETE FROM ActivitySupervisor WHERE activity_id = @ActivityId AND teacher_id = @TeacherId";
+                string deleteQuery = "DELETE FROM Teacher_Activity WHERE activity_id = @ActivityId AND teacher_id = @TeacherId";
                 SqlCommand deleteCommand = new SqlCommand(deleteQuery, connection);
                 deleteCommand.Parameters.AddWithValue("@ActivityId", activityId);
                 deleteCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
@@ -86,12 +93,42 @@ namespace ProjectSomeren.Controllers
             return RedirectToAction(nameof(Manage), new { id = activityId });
         }
 
+        // Helper method: Get all activities
+        private List<Activity> GetAllActivities()
+        {
+            List<Activity> activities = new List<Activity>();
+
+            string query = "SELECT activity_id, title, description, date FROM Activity ORDER BY title";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        activities.Add(new Activity
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                            Description = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Date = reader.IsDBNull(3) ? DateTime.MinValue : reader.GetDateTime(3)
+                        });
+                    }
+                }
+            }
+
+            return activities;
+        }
+
         // Helper method: Get activity by ID
         private Activity GetActivityById(int id)
         {
             Activity activity = null;
 
-            string query = "SELECT activity_id, activity_name, description, start_date, end_date, location FROM Activity WHERE activity_id = @Id";
+            string query = "SELECT activity_id, title, description, date FROM Activity WHERE activity_id = @Id";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -108,9 +145,7 @@ namespace ProjectSomeren.Controllers
                             Id = reader.GetInt32(0),
                             Name = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
                             Description = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-                            StartDate = reader.IsDBNull(3) ? DateTime.MinValue : reader.GetDateTime(3),
-                            EndDate = reader.IsDBNull(4) ? DateTime.MinValue : reader.GetDateTime(4),
-                            Location = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                            Date = reader.IsDBNull(3) ? DateTime.MinValue : reader.GetDateTime(3)
                         };
                     }
                 }
@@ -126,7 +161,7 @@ namespace ProjectSomeren.Controllers
 
             string query = @"SELECT t.teacher_id, t.first_name, t.last_name, t.email, t.department, t.age, t.telephone_number
                            FROM Teacher t
-                           INNER JOIN ActivitySupervisor a ON t.teacher_id = a.teacher_id
+                           INNER JOIN Teacher_Activity a ON t.teacher_id = a.teacher_id
                            WHERE a.activity_id = @ActivityId
                            ORDER BY t.last_name, t.first_name";
 
@@ -165,7 +200,7 @@ namespace ProjectSomeren.Controllers
             string query = @"SELECT t.teacher_id, t.first_name, t.last_name, t.email, t.department, t.age, t.telephone_number
                            FROM Teacher t
                            WHERE t.teacher_id NOT IN (
-                               SELECT teacher_id FROM ActivitySupervisor WHERE activity_id = @ActivityId
+                               SELECT teacher_id FROM Teacher_Activity WHERE activity_id = @ActivityId
                            )
                            ORDER BY t.last_name, t.first_name";
 
