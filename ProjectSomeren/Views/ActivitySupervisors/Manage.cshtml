@@ -5,22 +5,48 @@
 }
 
 <div class="container mt-5">
-    <div class="card">
+    <!-- Activity Details Card -->
+    <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">@Model.Activity.Name</h4>
+            <h3 class="mb-0">@Model.Activity.Name</h3>
         </div>
         <div class="card-body">
-            <p><strong>Description:</strong> @Model.Activity.Description</p>
-            <p><strong>Date:</strong> @Model.Activity.Date.ToString("yyyy-MM-dd")</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>Description:</strong>
+                        <p>@Model.Activity.Description</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>Date:</strong>
+                        <p>@Model.Activity.Date.ToString("dddd, MMMM d, yyyy")</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row mt-4">
+    <!-- Confirmation Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Supervisors and Available Lecturers Section -->
+    <div class="row">
         <!-- Current Supervisors -->
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Current Supervisors</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-check"></i> Current Supervisors 
+                        <span class="badge bg-light text-dark">@Model.CurrentSupervisors.Count</span>
+                    </h5>
                 </div>
                 <div class="card-body">
                     @if (Model.CurrentSupervisors.Any())
@@ -28,35 +54,48 @@
                         <div class="list-group">
                             @foreach (var supervisor in Model.CurrentSupervisors)
                             {
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>@supervisor.FirstName @supervisor.LastName</strong>
-                                        <br />
-                                        <small>@supervisor.Department</small>
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-1">@supervisor.FirstName @supervisor.LastName</h6>
+                                            <small class="text-muted">
+                                                <strong>Department:</strong> @supervisor.Department<br />
+                                                <strong>Email:</strong> @supervisor.Email<br />
+                                                <strong>Phone:</strong> @supervisor.TelephoneNumber
+                                            </small>
+                                        </div>
+                                        <form method="post" action="@Url.Action("RemoveSupervisor")" style="display: inline;" 
+                                              onsubmit="return confirm('Are you sure you want to remove @supervisor.FirstName @supervisor.LastName as a supervisor?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="activityId" value="@Model.Activity.Id" />
+                                            <input type="hidden" name="lecturerId" value="@supervisor.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger ms-2">
+                                                <i class="bi bi-trash"></i> Remove
+                                            </button>
+                                        </form>
                                     </div>
-                                    <form method="post" action="@Url.Action("RemoveSupervisor")" style="display: inline;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="activityId" value="@Model.Activity.Id" />
-                                        <input type="hidden" name="lecturerId" value="@supervisor.Id" />
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove this supervisor?');">Remove</button>
-                                    </form>
                                 </div>
                             }
                         </div>
                     }
                     else
                     {
-                        <p class="text-muted">No supervisors assigned yet.</p>
+                        <div class="alert alert-info mb-0" role="alert">
+                            <i class="bi bi-info-circle"></i> No supervisors assigned yet. Select from available lecturers.
+                        </div>
                     }
                 </div>
             </div>
         </div>
 
         <!-- Available Lecturers -->
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Available Lecturers</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-plus"></i> Available Lecturers 
+                        <span class="badge bg-light text-dark">@Model.AvailableLecturers.Count</span>
+                    </h5>
                 </div>
                 <div class="card-body">
                     @if (Model.AvailableLecturers.Any())
@@ -64,32 +103,44 @@
                         <div class="list-group">
                             @foreach (var lecturer in Model.AvailableLecturers)
                             {
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>@lecturer.FirstName @lecturer.LastName</strong>
-                                        <br />
-                                        <small>@lecturer.Department</small>
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-1">@lecturer.FirstName @lecturer.LastName</h6>
+                                            <small class="text-muted">
+                                                <strong>Department:</strong> @lecturer.Department<br />
+                                                <strong>Email:</strong> @lecturer.Email<br />
+                                                <strong>Phone:</strong> @lecturer.TelephoneNumber
+                                            </small>
+                                        </div>
+                                        <form method="post" action="@Url.Action("AddSupervisor")" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="activityId" value="@Model.Activity.Id" />
+                                            <input type="hidden" name="lecturerId" value="@lecturer.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success ms-2">
+                                                <i class="bi bi-plus-circle"></i> Add
+                                            </button>
+                                        </form>
                                     </div>
-                                    <form method="post" action="@Url.Action("AddSupervisor")" style="display: inline;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="activityId" value="@Model.Activity.Id" />
-                                        <input type="hidden" name="lecturerId" value="@lecturer.Id" />
-                                        <button type="submit" class="btn btn-sm btn-success">Add</button>
-                                    </form>
                                 </div>
                             }
                         </div>
                     }
                     else
                     {
-                        <p class="text-muted">All lecturers are already supervisors.</p>
+                        <div class="alert alert-info mb-0" role="alert">
+                            <i class="bi bi-info-circle"></i> All lecturers are already assigned as supervisors.
+                        </div>
                     }
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Back Button -->
     <div class="mt-4">
-        <a href="@Url.Action("Index", "ActivitySupervisors")" class="btn btn-secondary">Back to Activities</a>
+        <a href="@Url.Action("Index", "ActivitySupervisors")" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Activities
+        </a>
     </div>
 </div>

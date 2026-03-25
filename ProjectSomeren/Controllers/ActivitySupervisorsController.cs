@@ -49,9 +49,24 @@ namespace ProjectSomeren.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddSupervisor(int activityId, int lecturerId)
         {
+            string lecturerName = "";
+            
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
+
+                // Get lecturer name for confirmation message
+                string nameQuery = "SELECT first_name, last_name FROM Teacher WHERE teacher_id = @TeacherId";
+                SqlCommand nameCommand = new SqlCommand(nameQuery, connection);
+                nameCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
+                
+                using (SqlDataReader reader = nameCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        lecturerName = $"{reader.GetString(0)} {reader.GetString(1)}";
+                    }
+                }
 
                 // Check if the supervisor already exists
                 string checkQuery = "SELECT COUNT(*) FROM Teacher_Activity WHERE activity_id = @ActivityId AND teacher_id = @TeacherId";
@@ -68,6 +83,7 @@ namespace ProjectSomeren.Controllers
                     insertCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
 
                     insertCommand.ExecuteNonQuery();
+                    TempData["SuccessMessage"] = $"? {lecturerName} has been added as a supervisor.";
                 }
             }
 
@@ -79,15 +95,32 @@ namespace ProjectSomeren.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult RemoveSupervisor(int activityId, int lecturerId)
         {
+            string lecturerName = "";
+
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
+                connection.Open();
+
+                // Get lecturer name for confirmation message
+                string nameQuery = "SELECT first_name, last_name FROM Teacher WHERE teacher_id = @TeacherId";
+                SqlCommand nameCommand = new SqlCommand(nameQuery, connection);
+                nameCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
+
+                using (SqlDataReader reader = nameCommand.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        lecturerName = $"{reader.GetString(0)} {reader.GetString(1)}";
+                    }
+                }
+
                 string deleteQuery = "DELETE FROM Teacher_Activity WHERE activity_id = @ActivityId AND teacher_id = @TeacherId";
                 SqlCommand deleteCommand = new SqlCommand(deleteQuery, connection);
                 deleteCommand.Parameters.AddWithValue("@ActivityId", activityId);
                 deleteCommand.Parameters.AddWithValue("@TeacherId", lecturerId);
 
-                connection.Open();
                 deleteCommand.ExecuteNonQuery();
+                TempData["SuccessMessage"] = $"? {lecturerName} has been removed as a supervisor.";
             }
 
             return RedirectToAction(nameof(Manage), new { id = activityId });
