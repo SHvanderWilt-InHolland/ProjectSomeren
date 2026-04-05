@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Drinks";
 }
-<h1>drinks</h1>
+<h1>Drinks</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Add New Drink</a>
@@ -49,10 +49,11 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
-                <th> Name</th>                
+                <th>Name</th>                
                 <th>Price</th>
-                <th>Vat</th>
+                <th>VAT</th>
                 <th>Stock</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -60,8 +61,8 @@ else
             {
                 <tr>
                     <td>@drink.Name</td>                    
-                    <td>@drink.Price</td>
-                    <td>@drink.Vat</td>
+                    <td>€ @drink.Price.ToString("F2")</td>
+                    <td>@drink.Vat%</td>
                     <td>@drink.Stock</td>
                     <td>
                         <a asp-action="Edit" asp-route-id="@drink.Drink_Id" class="btn btn-sm btn-warning">Edit</a>
