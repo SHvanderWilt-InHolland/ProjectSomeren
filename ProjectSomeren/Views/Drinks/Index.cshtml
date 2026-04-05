@@ -1,0 +1,74 @@
+﻿@model List<ProjectSomeren.Models.Drink>
+@{
+    ViewData["Title"] = "Drinks";
+}
+<h1>drinks</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Drink</a>
+</p>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="searchName" class="form-control" placeholder="Search by name..."
+                       value="@ViewData["searchName"]" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-info">Search</button>
+                <a asp-action="Index" class="btn btn-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">
+        @if (!string.IsNullOrEmpty(ViewData["searchName"]?.ToString()))
+        {
+            <p>No drinks found with name containing "@ViewData["searchName"]"</p>
+        }
+        else
+        {
+            <p>No drinks found.</p>
+        }
+    </div>
+}
+else
+{
+    <p>
+        Total drinks: <strong>@Model.Count</strong>
+        @if (!string.IsNullOrEmpty(ViewData["searchName"]?.ToString()))
+        {
+            <span>(filtered by name: <strong>@ViewData["searchName"]</strong>)</span>
+        }
+    </p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th> Name</th>                
+                <th>Price</th>
+                <th>Vat</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var drink in Model)
+            {
+                <tr>
+                    <td>@drink.Name</td>                    
+                    <td>@drink.Price</td>
+                    <td>@drink.Vat</td>
+                    <td>@drink.Stock</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@drink.Drink_Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@drink.Drink_Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
