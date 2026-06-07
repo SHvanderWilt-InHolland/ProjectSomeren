@@ -7,7 +7,9 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Add New Drink</a>
 </p>
-
+<p>
+    <a asp-action="Order" class="btn btn-primary">Order drinks</a>
+</p>
 <div class="card mb-3">
     <div class="card-body">
         <form asp-action="Index" method="get" class="row g-3">
@@ -67,7 +69,7 @@ else
                     <td>
                         <a asp-action="Edit" asp-route-id="@drink.Drink_Id" class="btn btn-sm btn-warning">Edit</a>
                         <a asp-action="Delete" asp-route-id="@drink.Drink_Id" class="btn btn-sm btn-danger">Delete</a>
-                        <a asp-action="Order" asp-route-id= class="form-group mt-2">Order</a>
+                      
                     </td>
                 </tr>
             }
